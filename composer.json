@@ -5,7 +5,8 @@
     "description": "PHP Library for replacing images in html to thumbnails",
     "keywords": ["image", "photo", "thumbnail", "thumb"],
     "require": {
-        "php": ">=7.2.0"
+        "php": ">=7.2.0",
+        "mavik/image": "dev-master"
     },    
     "authors": [
         {
@@ -15,8 +16,8 @@
     ],    
     "autoload": {
         "psr-4": {
-            "Mavik\\Image\\": "src/",
-            "Mavik\\Image\\Tests\\": "tests/"
+            "Mavik\\Thumbnails\\": "src/",
+            "Mavik\\Thumbnails\\Tests\\": "tests/"
         }
     },
     "require-dev": {
