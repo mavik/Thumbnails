@@ -2,7 +2,7 @@
 /**
  * PHP Library for replacing images in html to thumbnails.
  *
- * @package Mavik\Image
+ * @package Mavik\Thumbnails
  * @author Vitalii Marenkov <admin@mavik.com.ua>
  * @copyright 2023 Vitalii Marenkov
  * @license MIT; see LICENSE
@@ -10,12 +10,21 @@
 namespace Mavik\Thumbnails;
 
 class Thumbnails
-{    
+{
+    /**@var Configuration */
+    private $configuration;
+
+    /** @var ImageProcessor */
     private $imageProcessor;
     
-    public function __construct()
+    public function __construct(Configuration $configuration)
     {
-        $this->imageProcessor = new ImageProcessor();
+        $this->configuration = $configuration;
+        $imageFactory = new ImageFactory(
+            $configuration->server()->baseUrl(),
+            $configuration->server()->webRootDir()
+        );
+        $this->imageProcessor = new ImageProcessor($imageFactory);
     }
 
     /**
@@ -23,42 +32,12 @@ class Thumbnails
      * 
      * @throws Exception
      */
-    public function process(string $html): string
+    public function process(string $html, $params): string
     {
-        $document = $this->parseHtml($html);
-        foreach ($this->findImages($document) as $image) {
-            $this->imageProcessor->process($image);
+        $document = new HtmlDocument($html);
+        foreach ($document->findImages() as $image) {
+            $this->imageProcessor->replaceToThumbnail($image, $params);
         }
-        return $this->toString($document);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function parseHtml(string $html): \DOMDocument
-    {
-        $document = new \DOMDocument('1.0', 'UTF-8');
-        if ($document->loadHTML($html, LIBXML_HTML_NOIMPLIED|LIBXML_HTML_NODEFDTD)) {
-            return $document;
-        }
-        throw new Exception('Cannot load argument as HTML');
-    }
-    
-    private function findImages(\DOMDocument $document): \DOMNodeList
-    {
-        $xpath = new \DOMXPath($document);
-        return $xpath->query('//img');        
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function toString(\DOMDocument $document): string
-    {
-        $result = $document->saveHTML();
-        if ($result === false) {
-            throw new Exception('Cannot save result as HTML');
-        }
-        return $result;        
+        return (string)$document;
     }
 }
