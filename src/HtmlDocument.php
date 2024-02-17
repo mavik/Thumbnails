@@ -18,6 +18,11 @@ class HtmlDocument
     /** @var \DOMXPath */
     private $xpath;
 
+    /**
+     * @param string $html
+     * @throws \InvalidArgumentException
+     * @throws Exception
+     */
     public function __construct(string $html)
     {
         $this->dom = $this->parseHtml($html);
@@ -30,7 +35,7 @@ class HtmlDocument
     }
     
     /**
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     private function parseHtml(string $html): \DOMDocument
     {
