@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
  *  PHP Library for Image processing and creating thumbnails
  *  
@@ -17,10 +19,17 @@ class Server
     /** @var string */
     private $webRootDir;
     
-    public function __construct(string $baseUrl, string $webRootDir)
-    {
+    /** @var array */
+    private $graphicLibraryPriority;
+
+    public function __construct(
+        string $baseUrl,
+        string $webRootDir,
+        array $graphicLibraryPriority = null
+    ) {
         $this->baseUrl = $baseUrl;
         $this->webRootDir = $webRootDir;
+        $this->graphicLibraryPriority = $graphicLibraryPriority;
     }
     
     public function baseUrl(): string
@@ -31,5 +40,10 @@ class Server
     public function webRootDir(): string
     {
         return $this->webRootDir;
+    }
+    
+    public function graphicLibraryPriority(): array
+    {
+        return $this->graphicLibraryPriority;
     }
 }

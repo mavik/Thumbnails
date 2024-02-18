@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * PHP Library for replacing images in html to thumbnails.
  *
@@ -8,6 +10,9 @@
  * @license MIT; see LICENSE
  */
 namespace Mavik\Thumbnails;
+
+use Mavik\Image\ImageFactory;
+use Mavik\Image\Configuration as ImageConfiguration;
 
 class Thumbnails
 {
@@ -20,10 +25,13 @@ class Thumbnails
     public function __construct(Configuration $configuration)
     {
         $this->configuration = $configuration;
-        $imageFactory = new ImageFactory(
-            $configuration->server()->baseUrl(),
-            $configuration->server()->webRootDir()
+        $serverConfiguration = $configuration->server();
+        $imageConfiguration = new ImageConfiguration(
+            $serverConfiguration->baseUrl(),
+            $serverConfiguration->webRootDir(),
+            $serverConfiguration->graphicLibraryPriority()
         );
+        $imageFactory = new ImageFactory($imageConfiguration);
         $this->imageProcessor = new ImageProcessor($imageFactory);
     }
 
@@ -32,11 +40,11 @@ class Thumbnails
      * 
      * @throws Exception
      */
-    public function process(string $html, $params): string
+    public function process(string $html): string
     {
         $document = new HtmlDocument($html);
         foreach ($document->findImages() as $image) {
-            $this->imageProcessor->replaceToThumbnail($image, $params);
+            $this->imageProcessor->replaceToThumbnail($image, $this->configuration->thumbnails());
         }
         return (string)$document;
     }

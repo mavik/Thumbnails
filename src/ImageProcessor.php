@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /**
  * PHP Library for replacing images in html to thumbnails.
  *
@@ -10,6 +12,7 @@
 
 namespace Mavik\Thumbnails;
 
+use Mavik\Image\ImageFactory;
 use Mavik\Image\ImageImmutable;
 use Mavik\Image\ImageWithThumbnails;
 use Mavik\Thumbnails\Configuration\Thumbnails as ConfigurationThumbnails;
@@ -24,8 +27,10 @@ class ImageProcessor
         $this->imageFactory = $imageFactory;
     }
 
-    public function replaceToThumbnail(\DOMElement $imageTag, ConfigurationThumbnails $configurationThumbnails): void
-    {
+    public function replaceToThumbnail(
+        \DOMElement $imageTag,
+        ConfigurationThumbnails $configurationThumbnails
+    ): void {
         $imageWithThumbnails = $this->crateImageWithThumbnails(
             $imageTag,
             $configurationThumbnails->resizeType(),
@@ -38,16 +43,25 @@ class ImageProcessor
         }        
         $defaultThumbnail = $this->selectDefaultThumbnail($imageWithThumbnails);
         $imageTag->setAttribute('src', $defaultThumbnail->getUrl());
-        $imageTag->setAttribute('width', $defaultThumbnail->getWidth());
-        $imageTag->setAttribute('height', $defaultThumbnail->getHeight());        
+        $imageTag->setAttribute('width', (string)$defaultThumbnail->getWidth());
+        $imageTag->setAttribute('height', (string)$defaultThumbnail->getHeight());        
     }
 
-    private function crateImageWithThumbnails(\DOMElement $imageTag, string $resizeType, array $thumbnailScails): ImageWithThumbnails
-    {
+    private function crateImageWithThumbnails(
+        \DOMElement $imageTag,
+        string $resizeType,
+        array $thumbnailScails
+    ): ImageWithThumbnails {
         $src = $imageTag->getAttribute('src');
-        $width = $imageTag->getAttribute('width');
-        $height = $imageTag->getAttribute('height');
-        return $this->imageFactory->create($src, $width, $height, $resizeType, $thumbnailScails);
+        $width = (int)$imageTag->getAttribute('width');
+        $height = (int)$imageTag->getAttribute('height');
+        return $this->imageFactory->createImageWithThumbnails(
+            $src,
+            $width,
+            $height,
+            $resizeType,
+            $thumbnailScails
+        );
     }
     
     /**

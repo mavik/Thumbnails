@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
  *  PHP Library for Image processing and creating thumbnails
  *  
@@ -17,11 +19,19 @@ namespace Mavik\Thumbnails\Configuration;
 class Thumbnails
 {
     /** @var string */
-    private $resizeType = 'Stretch';
+    private $resizeType;
     
     /** @var array */
-    private $scales = [1];
+    private $scales;
     
+    public function __construct(
+        string $resizeType = 'Stretch',
+        array $scales = [1]
+    ) {
+        $this->resizeType = $resizeType;
+        $this->scales = $scales;
+    }
+
     public function resizeType(): string
     {
         return $this->resizeType;

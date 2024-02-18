@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
  *  PHP Library for Image processing and creating thumbnails
  *  
@@ -31,10 +33,9 @@ class Configuration
     {
         return $this->server;
     }
-    
+
     public function thumbnails(): Thumbnails
     {
         return $this->thumbnails;
     }
-
 }
