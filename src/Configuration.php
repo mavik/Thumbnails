@@ -12,21 +12,22 @@ declare(strict_types=1);
 namespace Mavik\Thumbnails;
 
 use Mavik\Thumbnails\Configuration\Server;
-use Mavik\Thumbnails\Configuration\Thumbnails;
+use Mavik\Thumbnails\Configuration\Base;
 
 class Configuration
 {
     /** @var Server */
     private $server;
 
-    /** @var Thumbnails */
-    private $thumbnails;
+    /** @var Base */
+    private $base;
     
     public function __construct(
         Server $server,
-        Thumbnails $thumbnails
+        Base $base
     ) {
-        $this->thumbnails = $thumbnails;
+        $this->server = $server;
+        $this->base = $base;
     }
     
     public function server(): Server
@@ -34,8 +35,8 @@ class Configuration
         return $this->server;
     }
 
-    public function thumbnails(): Thumbnails
+    public function base(): Base
     {
-        return $this->thumbnails;
+        return $this->base;
     }
 }

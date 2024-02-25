@@ -40,12 +40,19 @@ class Thumbnails
      * 
      * @throws Exception
      */
-    public function process(string $html): string
+    public function __invoke(string $html): string
     {
         $document = new HtmlDocument($html);
-        foreach ($document->findImages() as $image) {
-            $this->imageProcessor->replaceToThumbnail($image, $this->configuration->thumbnails());
+        foreach ($document->findImages() as $imageTag) {
+            if ($this->isImageToReplace($imageTag)) {
+                $this->imageProcessor->replaceToThumbnail($imageTag, $this->configuration->base());
+            }
         }
         return (string)$document;
+    }
+    
+    private function isImageToReplace(\DOMElement $imageTag): bool
+    {
+        return true;
     }
 }

@@ -15,7 +15,7 @@ namespace Mavik\Thumbnails;
 use Mavik\Image\ImageFactory;
 use Mavik\Image\ImageImmutable;
 use Mavik\Image\ImageWithThumbnails;
-use Mavik\Thumbnails\Configuration\Thumbnails as ConfigurationThumbnails;
+use Mavik\Thumbnails\Configuration\Base as ConfigurationThumbnails;
 
 class ImageProcessor
 {

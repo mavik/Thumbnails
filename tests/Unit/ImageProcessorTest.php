@@ -30,7 +30,7 @@ class ImageProcessorTest extends TestCase
         $scales = [1,2];
         $scrset = 'thumb-1-test.jpg 200w, thumb-2-test.jpg 400w';
         
-        $configurationThumbnails = new Configuration\Thumbnails('Stretch', $scales);         
+        $configurationThumbnails = new Configuration\Base('Stretch', $scales);         
         $imageTag = $this->createImgTag($src, $width, $height);
         $imageFactory = $this->createImageFactory($imageTag, $configurationThumbnails);                
         $imageProcessor = new ImageProcessor($imageFactory);
@@ -54,7 +54,7 @@ class ImageProcessorTest extends TestCase
 
     private function createImageFactory(
         \DOMElement $imageTag,
-        Configuration\Thumbnails $configurationThumbnails
+        Configuration\Base $configurationThumbnails
     ): ImageFactory {
         $src = $imageTag->getAttribute('src');
         $width = $imageTag->getAttribute('width');
