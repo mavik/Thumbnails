@@ -15,7 +15,6 @@ namespace Mavik\Thumbnails\Specification;
 use PHPUnit\Framework\TestCase;
 use Mavik\Thumbnails\Configuration;
 
-
 class IsImageToReplaceTest extends TestCase
 {
     /**
