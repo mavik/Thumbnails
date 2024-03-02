@@ -15,7 +15,7 @@ namespace Mavik\Thumbnails\Specification;
 use PHPUnit\Framework\TestCase;
 use Mavik\Thumbnails\Configuration;
 
-class IsImageToReplaceTest extends TestCase
+class HasSuitedClassTest extends TestCase
 {
     /**
      * @covers IsImageToReplace::__invoke
@@ -30,7 +30,7 @@ class IsImageToReplaceTest extends TestCase
             new Configuration\Server('', ''),
             new Configuration\Base('', [1], $include, $exclude)
         );
-        $this->assertEquals($result, (new IsImageToReplace())($imgTag, $configuration));
+        $this->assertEquals($result, (new HasSuitedClass())($imgTag, $configuration));
     }
     
     public function dataProvider(): array

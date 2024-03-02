@@ -13,12 +13,7 @@ namespace Mavik\Thumbnails\Specification;
 
 use Mavik\Thumbnails\Configuration;
 
-/**
- * Description of IsImageToReplace
- *
- * @author mavik
- */
-class IsImageToReplace
+class HasSuitedClass
 {
     public function __invoke(\DOMElement $imageTag, Configuration $confuguration): bool
     {
