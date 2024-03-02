@@ -10,31 +10,32 @@ declare(strict_types=1);
  * @license MIT; see LICENSE
  */
 
-namespace Mavik\Thumbnails;
+namespace Mavik\Thumbnails\Action;
 
 use Mavik\Image\ImageFactory;
 use Mavik\Image\ImageImmutable;
 use Mavik\Image\ImageWithThumbnails;
-use Mavik\Thumbnails\Configuration\Base as ConfigurationThumbnails;
+use Mavik\Thumbnails\Configuration\Base as Configuration;
 
-class ImageProcessor
+class ReplaceToThumbnail extends AbstractAtion
 {
     /** @var ImageFactory */
     private $imageFactory;
+    
+    /** @var Configuration */
+    private $configuration;
 
-    public function __construct(ImageFactory $imageFactory)
+    public function __construct(ImageFactory $imageFactory, Configuration $configuration)
     {
         $this->imageFactory = $imageFactory;
+        $this->configuration = $configuration;
     }
 
-    public function replaceToThumbnail(
-        \DOMElement $imageTag,
-        ConfigurationThumbnails $configurationThumbnails
-    ): void {
+    public function __invoke(\DOMElement $imageTag): void {
         $imageWithThumbnails = $this->crateImageWithThumbnails(
             $imageTag,
-            $configurationThumbnails->resizeType(),
-            $configurationThumbnails->scales()
+            $this->configuration->resizeType(),
+            $this->configuration->scales()
         );
         $srcset = $this->createScrset($imageWithThumbnails->getThumbnails());
         if(!empty($srcset)) {

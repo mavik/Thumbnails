@@ -8,17 +8,16 @@
  * @license MIT; see LICENSE
  */
 
-namespace Mavik\Thumbnails;
+namespace Mavik\Thumbnails\Action;
 
+use Mavik\Thumbnails\Configuration\Base as Configuration;
 use Mavik\Image\ImageFactory;
 use Mavik\Image\ImageWithThumbnails;
 use Mavik\Image\ImageImmutable;
-use Mavik\Image\ImageSize;
 use PHPUnit\Framework\TestCase;
 
-class ImageProcessorTest extends TestCase
+class ReplaceToThumbnailTest extends TestCase
 {
-
     /**
      * @covers ImageProcessor::replaceToThumbnail
      */
@@ -30,12 +29,12 @@ class ImageProcessorTest extends TestCase
         $scales = [1,2];
         $scrset = 'thumb-1-test.jpg 200w, thumb-2-test.jpg 400w';
         
-        $configurationThumbnails = new Configuration\Base('Stretch', $scales);         
+        $configuration = new Configuration('Stretch', $scales);         
         $imageTag = $this->createImgTag($src, $width, $height);
-        $imageFactory = $this->createImageFactory($imageTag, $configurationThumbnails);                
-        $imageProcessor = new ImageProcessor($imageFactory);
+        $imageFactory = $this->createImageFactory($imageTag, $configuration);                
+        $replaceToThumbnail = new ReplaceToThumbnail($imageFactory, $configuration);
         
-        $imageProcessor->replaceToThumbnail($imageTag, $configurationThumbnails);
+        $replaceToThumbnail($imageTag);
         
         $this->assertEquals($this->thumbName($src, 1), $imageTag->getAttribute('src'));
         $this->assertEquals($scrset, $imageTag->getAttribute('srcset'));
@@ -54,7 +53,7 @@ class ImageProcessorTest extends TestCase
 
     private function createImageFactory(
         \DOMElement $imageTag,
-        Configuration\Base $configurationThumbnails
+        Configuration $configurationThumbnails
     ): ImageFactory {
         $src = $imageTag->getAttribute('src');
         $width = $imageTag->getAttribute('width');
