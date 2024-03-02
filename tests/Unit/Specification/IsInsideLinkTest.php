@@ -43,7 +43,7 @@ class IsInsideLinkTest extends TestCase
         $imgTag = $dom->createElement('img');
         $pTag->appendChild($imgTag);
         
-        $isInsideLink = new isInsideLink();        
+        $isInsideLink = new IsInsideLink();        
         $this->assertTrue($isInsideLink($imgTag, $this->configuration));
     }
     
@@ -61,7 +61,7 @@ class IsInsideLinkTest extends TestCase
         $imgTag = $dom->createElement('img');
         $divWithHref->appendChild($imgTag);
         
-        $isInsideLink = new isInsideLink();        
+        $isInsideLink = new IsInsideLink();        
         $this->assertFalse($isInsideLink($imgTag, $this->configuration));
     }
 }

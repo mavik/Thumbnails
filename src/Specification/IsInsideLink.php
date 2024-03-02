@@ -13,7 +13,7 @@ namespace Mavik\Thumbnails\Specification;
 
 use Mavik\Thumbnails\Configuration;
 
-class isInsideLink
+class IsInsideLink
 {
     public function __invoke(\DOMElement $imageTag, Configuration $confuguration): bool
     {
