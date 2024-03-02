@@ -30,7 +30,8 @@ class HasSuitedClassTest extends TestCase
             new Configuration\Server('', ''),
             new Configuration\Base('', [1], $include, $exclude)
         );
-        $this->assertEquals($result, (new HasSuitedClass())($imgTag, $configuration));
+        $hasSuitedClass = new HasSuitedClass($configuration);        
+        $this->assertEquals($result, $hasSuitedClass($imgTag));
     }
     
     public function dataProvider(): array

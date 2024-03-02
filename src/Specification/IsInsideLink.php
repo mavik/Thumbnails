@@ -11,11 +11,9 @@ declare(strict_types=1);
  */
 namespace Mavik\Thumbnails\Specification;
 
-use Mavik\Thumbnails\Configuration;
-
 class IsInsideLink
 {
-    public function __invoke(\DOMElement $imageTag, Configuration $confuguration): bool
+    public function __invoke(\DOMElement $imageTag): bool
     {
         $parentNode = $imageTag;
         while ($parentNode = $parentNode->parentNode) {
