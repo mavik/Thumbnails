@@ -17,18 +17,27 @@ class Image
     /** @var \DOMElement */
     private $domElement;
     
-    /** @var int */
+    /** @var float */
     private $width;
+    
+    /** @var string */
+    private $widthUnit;
 
-    /** @var int */
+    /** @var float */
     private $height;
+
+    /** @var string */
+    private $heightUnit;
     
     /** @var bool */
-    private $isSizeInStyle;
+    private $isWidthInStyle = false;
 
     /** @var bool */
-    private $isSizeInPixels;
+    private $isHeightInStyle = false;
     
+    /** @var bool */
+    private $isSizeInPixels = false;
+
     public function __construct(\DOMElement $domElement)
     {
         $this->domElement = $domElement;
@@ -40,24 +49,29 @@ class Image
         return $this->domElement->getAttribute('src');
     }
 
-    public function getWidth(): int
+    public function getWidth(): float
     {
         return $this->width;
     }
+    
+    public function getWidthUnit(): string
+    {
+        return $this->widthUnit;
+    }
 
-    public function getHeight(): int
+    public function getHeight(): float
     {
         return $this->height;
     }
     
-    public function isSizeInPixels(): bool
+    public function getHeightUnit(): string
+    {
+        return $this->heightUnit;
+    }
+    
+    public function isSizeInPixels()
     {
         return $this->isSizeInPixels;
-    }
-
-    public function isSizeInStyle(): bool
-    {
-        return $this->isSizeInStyle;
     }
 
     public function getAttribute(string $name): string
@@ -70,43 +84,45 @@ class Image
         return $this->domElement->hasAttribute($name);
     }
 
-
     private function initSize(): void
-    {
-        $this->isSizeInPixels = false;
+    { 
+        $this->isSizeInPixels = true;
+        
+        list($this->width, $this->widthUnit) = $this->numberValueFromAttribute('width');        
+        list($this->height, $this->heightUnit) = $this->numberValueFromAttribute('height');
         
         if ($this->domElement->hasAttribute('style')) {
             $style = $this->domElement->getAttribute('style');
-            list($widthInStyle, $widthUnitInStyle) = $this->intValueFromStyle('width', $style);
-            list($heightInStyle, $heightUnitInStyle) = $this->intValueFromStyle('height', $style);
-            if (isset($widthInStyle) && $widthUnitInStyle || isset($heightInStyle) && $heightUnitInStyle) {
-                $this->isSizeInPixels =
-                    (!isset($widthInStyle) || $widthUnitInStyle == 'px')
-                    && (!isset($heightInStyle) || $heightUnitInStyle = 'px')
-                ;
+            list($widthInStyle, $widthUnitInStyle) = $this->numberValueFromStyle('width', $style);
+            if ($widthInStyle && isset($widthUnitInStyle)) {
+                $this->isWidthInStyle = true;
                 $this->width = $widthInStyle;
+                $this->widthUnit = $widthUnitInStyle;
+            }
+            list($heightInStyle, $heightUnitInStyle) = $this->numberValueFromStyle('height', $style);
+            if (isset($heightInStyle) && isset($heightUnitInStyle)) {
+                $this->isHeightInStyle = true;
                 $this->height = $heightInStyle;
-                return;
+                $this->heightUnit = $heightUnitInStyle;
             }
         }
         
-        list($this->width, $widthUnit) = $this->intValueFromAttribute('width');
-        list($this->height, $heightUnit) = $this->intValueFromAttribute('height');
         $this->isSizeInPixels =
-            (!isset($widthUnit) || $widthUnit == 'px')
-            && (!isset($heightUnit) || $heightUnit == 'px')
-        ;        
+            (!isset($this->width) || $this->widthUnit == 'px')
+            && (!isset($this->height) || $this->heightUnit == 'px')
+        ;
     }
     
     /**
-     * @return array [<value>, <unit>]
+     * @return array [?float <value>, ?string <unit>]
      */
-    private function intValueFromAttribute(string $name): array
+    private function numberValueFromAttribute(string $name): array
     {
         $attribute = $this->hasAttribute($name) ? $this->getAttribute($name) : null;
-        if (preg_match("/(\d*[\.\,]?\d*)\s*(.*)/i", $attribute, $matches)) {
-            $value = (int)round($matches[1]);
-            $unit = strtolower(trim($matches[2]));
+        $numberReg = '\d+|\d*\.\d+';
+        if (preg_match("/($numberReg)\s*(.*)/i", $attribute, $matches)) {
+            $value = (float)$matches[1];
+            $unit = strtolower(trim($matches[2])) ?: 'px';
         } else {
             $value = null;
             $unit = null;
@@ -118,12 +134,13 @@ class Image
     }
     
     /**
-     * @return array [<value>, <unit>]
+     * @return array [?float <value>, ?string <unit>]
      */
-    private function intValueFromStyle(string $property, string $style): array
+    private function numberValueFromStyle(string $property, string $style): array
     {
-        if (preg_match("/(?<!\-)\b{$property}\s*:\s*(\d*[\.\,]?\d*)\s*([\w\%]+)/si", $style, $matches)) {
-            $value = (int)round($matches[1]);
+        $numberReg = '\d+|\d*\.\d+';
+        if (preg_match("/\b{$property}\s*:\s*($numberReg)\s*([a-zA-Z\%]+)/si", $style, $matches)) {
+            $value = (float)$matches[1];
             $unit = strtolower(trim($matches[2]));            
         } else {
             $value = null;
