@@ -50,7 +50,27 @@ class ImageTest extends TestCase
         $image = new Image($dom);
         $this->assertEquals($params['isSizeInPixels'], $image->isSizeInPixels());
     }
+    
+    /**
+     * @covers ::isWidthInStyle
+     * @dataProvider dataProvider
+     */
+    public function testIsWidthInStyle(\DOMElement $dom, array $params)
+    {
+        $image = new Image($dom);
+        $this->assertEquals($params['isWidthInStyle'], $image->isWidthInStyle());
+    }
 
+    /**
+     * @covers ::isHeightInStyle
+     * @dataProvider dataProvider
+     */
+    public function testIsHeightInStyle(\DOMElement $dom, array $params)
+    {
+        $image = new Image($dom);
+        $this->assertEquals($params['isHeightInStyle'], $image->isHeightInStyle());
+    }
+    
     public function dataProvider(): \Generator
     {
         $data = [
@@ -66,6 +86,8 @@ class ImageTest extends TestCase
                 'width' => 20,
                 'widthUnit' => 'px',
                 'isSizeInPixels' => true,
+                'isWidthInStyle' => false,
+                'isHeightInStyle' => false,
             ], [
                 'attributes' => [
                     'src' => 'test1.jpg',
@@ -78,6 +100,8 @@ class ImageTest extends TestCase
                 'width' => 30,
                 'widthUnit' => 'px',
                 'isSizeInPixels' => true,
+                'isWidthInStyle' => false,
+                'isHeightInStyle' => false,
             ], [
                 'attributes' => [
                     'src' => 'test2.jpg',
@@ -90,6 +114,8 @@ class ImageTest extends TestCase
                 'width' => 40,
                 'widthUnit' => '%',
                 'isSizeInPixels' => false,
+                'isWidthInStyle' => false,
+                'isHeightInStyle' => false,
             ], [
                 'attributes' => [
                     'src' => 'test3.jpg',
@@ -103,6 +129,8 @@ class ImageTest extends TestCase
                 'width' => 60,
                 'widthUnit' => 'px',
                 'isSizeInPixels' => true,
+                'isWidthInStyle' => true,
+                'isHeightInStyle' => false,
             ], [
                 'attributes' => [
                     'src' => 'test4.jpg',
@@ -116,6 +144,8 @@ class ImageTest extends TestCase
                 'width' => 50,
                 'widthUnit' => 'px',
                 'isSizeInPixels' => true,
+                'isWidthInStyle' => false,
+                'isHeightInStyle' => true,
             ], [
                 'attributes' => [
                     'src' => 'test5.jpg',
@@ -129,6 +159,8 @@ class ImageTest extends TestCase
                 'width' => 50,
                 'widthUnit' => 'px',
                 'isSizeInPixels' => true,
+                'isWidthInStyle' => false,
+                'isHeightInStyle' => false,
             ], [
                 'attributes' => [
                     'src' => 'test6.jpg',
@@ -142,6 +174,8 @@ class ImageTest extends TestCase
                 'width' => 90,
                 'widthUnit' => '%',
                 'isSizeInPixels' => false,
+                'isWidthInStyle' => true,
+                'isHeightInStyle' => true,
             ]
         ];
         $dom = new \DOMDocument();

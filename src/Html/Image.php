@@ -69,9 +69,19 @@ class Image
         return $this->heightUnit;
     }
     
-    public function isSizeInPixels()
+    public function isSizeInPixels(): bool
     {
         return $this->isSizeInPixels;
+    }
+    
+    public function isWidthInStyle(): bool
+    {
+        return $this->isWidthInStyle;
+    }
+    
+    public function isHeightInStyle(): bool
+    {
+        return $this->isHeightInStyle;
     }
 
     public function getAttribute(string $name): string
@@ -118,7 +128,10 @@ class Image
      */
     private function numberValueFromAttribute(string $name): array
     {
-        $attribute = $this->hasAttribute($name) ? $this->getAttribute($name) : null;
+        if (!$this->hasAttribute($name)) {
+            return [null, null];
+        }
+        $attribute = $this->getAttribute($name);
         $numberReg = '\d+|\d*\.\d+';
         if (preg_match("/($numberReg)\s*(.*)/i", $attribute, $matches)) {
             $value = (float)$matches[1];
