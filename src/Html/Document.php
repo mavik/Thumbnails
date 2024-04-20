@@ -51,7 +51,7 @@ class Document
             $this->isFragment = true;
             $html = "<!DOCTYPE html><html><body>{$html}</body></html>";
         }
-        if (1 ||PHP_VERSION_ID >= 84000) {
+        if (PHP_VERSION_ID >= 84000) {
             // Since PHP 8.4 HTML5 is supported natively
             $this->dom = new \DOMDocument();
             $this->dom->loadHTML($html);
