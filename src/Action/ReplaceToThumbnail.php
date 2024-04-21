@@ -16,8 +16,9 @@ use Mavik\Image\ImageFactory;
 use Mavik\Image\ImageImmutable;
 use Mavik\Image\ImageWithThumbnails;
 use Mavik\Thumbnails\Configuration\Base as Configuration;
+use Mavik\Thumbnails\JsAndCss;
 
-class ReplaceToThumbnail extends AbstractAtion
+class ReplaceToThumbnail extends Ation
 {
     /** @var ImageFactory */
     private $imageFactory;
@@ -31,7 +32,7 @@ class ReplaceToThumbnail extends AbstractAtion
         $this->configuration = $configuration;
     }
 
-    public function __invoke(\DOMElement $imageTag): void {
+    public function __invoke(\DOMElement $imageTag): JsAndCss {
         $imageWithThumbnails = $this->crateImageWithThumbnails(
             $imageTag,
             $this->configuration->resizeType(),
@@ -45,7 +46,8 @@ class ReplaceToThumbnail extends AbstractAtion
         $defaultThumbnail = $this->selectDefaultThumbnail($imageWithThumbnails);
         $imageTag->setAttribute('src', $defaultThumbnail->getUrl());
         $imageTag->setAttribute('width', (string)$defaultThumbnail->getWidth());
-        $imageTag->setAttribute('height', (string)$defaultThumbnail->getHeight());        
+        $imageTag->setAttribute('height', (string)$defaultThumbnail->getHeight());
+        return new JsAndCss();
     }
 
     private function crateImageWithThumbnails(

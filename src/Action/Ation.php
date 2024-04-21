@@ -12,7 +12,14 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Action;
 
-abstract class AbstractAtion
+use Mavik\Thumbnails\Specification\Specification;
+use Mavik\Thumbnails\JsAndCss;
+
+abstract class Ation
 {
-    abstract public function __invoke(\DOMElement $imgTag): void;
+    /**
+     * Change $element
+     * and return JavaScripts and CSS that must be added to HTML document
+     */
+    abstract public function __invoke(\DOMElement $element): JsAndCss;
 }
