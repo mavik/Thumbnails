@@ -18,24 +18,24 @@ class JsAndCss
     
     public function addJs(string $js): void
     {
-        $this->js[] = $js;
+        $this->js[$js] = true;
     }
     
     public function addCss(string $css): void
     {
-        $this->css[] = $css;
+        $this->css[$css] = true;
     }
     
     /** @return string[] */
     public function js(): array
     {
-        return $this->js;
+        return array_keys($this->js);
     }
 
     /** @return string[] */
     public function css(): array
     {
-        return $this->css;
+        return array_keys($this->css);
     }
     
     public function merge(self $jsAndCss): void

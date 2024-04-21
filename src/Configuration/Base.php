@@ -13,6 +13,10 @@ namespace Mavik\Thumbnails\Configuration;
 
 class Base
 {
+    const INSIDE_LINK_ACTION_NONE = 'none';
+    const INSIDE_LINK_ACTION_RESIZE = 'resize';
+    const INSIDE_LINK_ACTION_ALL = 'all';
+    
     /** @var string */
     private $resizeType;
     
@@ -24,17 +28,21 @@ class Base
     
     /** @var string[] */
     private $excludeClasses;
+    
+    private $insideLinkAction;
 
     public function __construct(
         string $resizeType = 'Stretch',
         array $scales = [1],
         array $includeClasses = [],
-        array $excludeClasses = []
+        array $excludeClasses = [],
+        string $insideLinkAction = self::INSIDE_LINK_ACTION_RESIZE
     ) {
         $this->resizeType = $resizeType;
         $this->scales = $scales;
         $this->includeClasses = $includeClasses;
         $this->excludeClasses = $excludeClasses;
+        $this->insideLinkAction = $insideLinkAction;
     }
 
     public function resizeType(): string
@@ -58,5 +66,10 @@ class Base
     public function excludeClasses(): array
     {
         return $this->excludeClasses;
+    }
+    
+    public function insideLinkAction(): string
+    {
+        return $this->insideLinkAction;
     }
 }

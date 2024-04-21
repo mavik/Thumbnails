@@ -15,24 +15,26 @@ use Mavik\Image\ImageFactory;
 use Mavik\Image\Configuration as ImageConfiguration;
 
 class Thumbnails
-{
-    /**@var Configuration */
-    private $configuration;
-
-    /** @var ImageProcessor */
-    private $imageProcessor;
+{   
+    /** @var \SplObjectStorage */
+    private $actions = [];
     
     public function __construct(Configuration $configuration)
     {
-        $this->configuration = $configuration;
+        $this->addActionReplaceToThumbnail($configuration);   
+    }
+    
+    private function addActionReplaceToThumbnail(Configuration $configuration): void
+    {
         $serverConfiguration = $configuration->server();
         $imageConfiguration = new ImageConfiguration(
             $serverConfiguration->baseUrl(),
             $serverConfiguration->webRootDir(),
             $serverConfiguration->graphicLibraryPriority()
         );
-        $imageFactory = new ImageFactory($imageConfiguration);
-        $this->imageProcessor = new ImageProcessor($imageFactory);
+        $imageFactory = new ImageFactory($imageConfiguration);                
+        $action = new Action\ReplaceToThumbnail($imageFactory, $configuration);
+        $this->actions[$action] = new Specification\ApplyReplaceToThumbnail($configuration);
     }
 
     /**
@@ -40,19 +42,24 @@ class Thumbnails
      * 
      * @throws Exception
      */
-    public function __invoke(string $html): string
+    public function __invoke(string $html): Result
     {
-        $document = new HtmlDocument($html);
+        $jsAndCss = new JsAndCss();
+        $document = new Document($html);
         foreach ($document->findImages() as $imageTag) {
-            if ($this->isImageToReplace($imageTag)) {
-                $this->imageProcessor->replaceToThumbnail($imageTag, $this->configuration->base());
-            }
+            $jsAndCss->merge($this->doActions($imageTag));
         }
-        return (string)$document;
+        return new Result((string)$document, $jsAndCss);
     }
     
-    private function isImageToReplace(\DOMElement $imageTag): bool
+    private function doActions(\DOMElement $imgTag): JsAndCss
     {
-        return true;
+        $jsAndCss = new JsAndCss();
+        foreach ($this->actions as $action => $specification) {
+            if ($specification($imgTag)) {
+                $jsAndCss->merge($action($imgTag));
+            }
+        }
+        return $jsAndCss;
     }
 }
