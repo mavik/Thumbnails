@@ -13,11 +13,12 @@ namespace Mavik\Thumbnails\Specification;
 
 class IsImage
 {
-    public function __invoke(\DOMElement $imgTag): bool
+    public function __invoke(\DOMElement $tag): bool
     {
         return
-            isset($imgTag->tagName)
-            && $imgTag->tagName == 'a'
+            isset($tag->tagName)
+            && $tag->tagName == 'img'
+            && !empty($tag->getAttribute('src'))
         ;
     }
 
