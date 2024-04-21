@@ -13,11 +13,11 @@ namespace Mavik\Thumbnails\Specification;
 
 use Mavik\Thumbnails\Configuration;
 
-class HasSuitedClass extends AbstractSpecification
+class HasSuitedClass extends Specification
 {
-    public function __invoke(\DOMElement $imageTag): bool
+    public function __invoke(\DOMElement $element): bool
     {
-        $classAtr = $imageTag->getAttribute('class');
+        $classAtr = $element->getAttribute('class');
         preg_match_all('/(\w+)/', $classAtr, $matches, PREG_PATTERN_ORDER);
         $classes = $matches[1];
         $includeClasses = $this->configuration->base()->includeClasses();

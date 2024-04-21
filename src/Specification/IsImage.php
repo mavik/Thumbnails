@@ -11,14 +11,14 @@ declare(strict_types=1);
  */
 namespace Mavik\Thumbnails\Specification;
 
-class IsImage
+class IsImage extends Specification
 {
-    public function __invoke(\DOMElement $tag): bool
+    public function __invoke(\DOMElement $element): bool
     {
         return
-            isset($tag->tagName)
-            && $tag->tagName == 'img'
-            && !empty($tag->getAttribute('src'))
+            isset($element->tagName)
+            && $element->tagName == 'img'
+            && !empty($element->getAttribute('src'))
         ;
     }
 

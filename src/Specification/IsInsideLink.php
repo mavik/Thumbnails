@@ -11,11 +11,11 @@ declare(strict_types=1);
  */
 namespace Mavik\Thumbnails\Specification;
 
-class IsInsideLink
+class IsInsideLink extends Specification
 {
-    public function __invoke(\DOMElement $imageTag): bool
+    public function __invoke(\DOMElement $element): bool
     {
-        $parentNode = $imageTag;
+        $parentNode = $element;
         while ($parentNode = $parentNode->parentNode) {
             if (
                 isset($parentNode->tagName)
