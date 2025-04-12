@@ -13,14 +13,16 @@ namespace Mavik\Thumbnails;
 
 use Mavik\Image\ImageFactory;
 use Mavik\Image\Configuration as ImageConfiguration;
+use Mavik\Thumbnails\Html\Document;
 
 class Thumbnails
 {   
     /** @var \SplObjectStorage */
-    private $actions = [];
+    private $actions;
     
     public function __construct(Configuration $configuration)
     {
+        $this->actions = new \SplObjectStorage();
         $this->addActionReplaceToThumbnail($configuration);   
     }
     
@@ -33,7 +35,7 @@ class Thumbnails
             $serverConfiguration->graphicLibraryPriority()
         );
         $imageFactory = new ImageFactory($imageConfiguration);                
-        $action = new Action\ReplaceToThumbnail($imageFactory, $configuration);
+        $action = new Action\ReplaceToThumbnail($imageFactory, $configuration->base());
         $this->actions[$action] = new Specification\ApplyReplaceToThumbnail($configuration);
     }
 
@@ -45,7 +47,7 @@ class Thumbnails
     public function __invoke(string $html): Result
     {
         $jsAndCss = new JsAndCss();
-        $document = new Document($html);
+        $document = Document::createFragment($html);
         foreach ($document->findImages() as $imageTag) {
             $jsAndCss->merge($this->doActions($imageTag));
         }
