@@ -29,7 +29,11 @@ class Server
     ) {
         $this->baseUrl = $baseUrl;
         $this->webRootDir = $webRootDir;
-        $this->graphicLibraryPriority = $graphicLibraryPriority;
+        $this->graphicLibraryPriority = $graphicLibraryPriority ?: [
+            'gmagick',
+            'imagick',
+            'gd2'
+        ];
     }
     
     public function baseUrl(): string
