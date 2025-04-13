@@ -21,7 +21,7 @@ class Document
      */
     private $parser;
     
-    /** @var \DOMDocumen */
+    /** @var \DOMDocument */
     private $dom;
     
     /** @var bool */
@@ -87,7 +87,7 @@ class Document
             $result = $this->dom->saveHTML();
         }
         if ($result === false) {
-            throw new Exception('Cannot convert DOMDocument to string');
+            throw new \Exception('Cannot convert DOMDocument to string');
         }
         return $result;        
     }
