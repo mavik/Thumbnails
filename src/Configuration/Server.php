@@ -18,6 +18,9 @@ class Server
     
     /** @var string */
     private $webRootDir;
+
+    /** @var string */
+    private $thumbnailsDir;
     
     /** @var array */
     private $graphicLibraryPriority;
@@ -25,10 +28,12 @@ class Server
     public function __construct(
         string $baseUrl,
         string $webRootDir,
+        string $thumbnailsDir,
         array $graphicLibraryPriority = null
     ) {
         $this->baseUrl = $baseUrl;
         $this->webRootDir = $webRootDir;
+        $this->thumbnailsDir = $thumbnailsDir;
         $this->graphicLibraryPriority = $graphicLibraryPriority ?: [
             'gmagick',
             'imagick',
@@ -44,6 +49,11 @@ class Server
     public function webRootDir(): string
     {
         return $this->webRootDir;
+    }
+
+    public function thumbnailsDir(): string
+    {
+        return $this->thumbnailsDir;
     }
     
     public function graphicLibraryPriority(): array

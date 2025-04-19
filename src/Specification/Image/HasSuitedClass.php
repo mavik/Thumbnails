@@ -9,15 +9,24 @@ declare(strict_types=1);
  *  @copyright 2024 Vitalii Marenkov
  *  @license MIT; see LICENSE
  */
-namespace Mavik\Thumbnails\Specification;
+
+ namespace Mavik\Thumbnails\Specification\Image;
 
 use Mavik\Thumbnails\Configuration;
+use Mavik\Thumbnails\Html\Image as HtmlImage;
 
-class HasSuitedClass extends Specification
+class HasSuitedClass extends Image
 {
-    public function __invoke(\DOMElement $element): bool
+    private Configuration $configuration;
+
+    public function __construct(Configuration $configuration)
     {
-        $classAtr = $element->getAttribute('class');
+        $this->configuration = $configuration;
+    }
+
+    protected function isSatisfiedByImage (HtmlImage $image): bool
+    {
+        $classAtr = $image->getAttribute('class');
         preg_match_all('/(\w+)/', $classAtr, $matches, PREG_PATTERN_ORDER);
         $classes = $matches[1];
         $includeClasses = $this->configuration->base()->includeClasses();

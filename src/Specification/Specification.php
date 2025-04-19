@@ -11,19 +11,9 @@ declare(strict_types=1);
  */
 namespace Mavik\Thumbnails\Specification;
 
-use Mavik\Thumbnails\Configuration;
-
 abstract class Specification
 {
-    /** @var Configuration */
-    protected $configuration;
-
-    public function __construct(Configuration $configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
-    abstract public function __invoke(\DOMElement $element): bool;
+    public abstract function isSatisfiedBy($candidate): bool;
     
     public function and(Specification $specification): Specification
     {

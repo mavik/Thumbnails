@@ -14,6 +14,8 @@ namespace Mavik\Thumbnails;
 use Mavik\Image\ImageFactory;
 use Mavik\Image\Configuration as ImageConfiguration;
 use Mavik\Thumbnails\Html\Document;
+use Mavik\Thumbnails\Html\Image;
+use Mavik\Thumbnails\Specification\Image\ReplaceToThumbnail as ReplaceToThumbnailSpecification;
 
 class Thumbnails
 {   
@@ -32,11 +34,12 @@ class Thumbnails
         $imageConfiguration = new ImageConfiguration(
             $serverConfiguration->baseUrl(),
             $serverConfiguration->webRootDir(),
+            $serverConfiguration->thumbnailsDir(),
             $serverConfiguration->graphicLibraryPriority()
         );
         $imageFactory = new ImageFactory($imageConfiguration);                
-        $action = new Action\ReplaceToThumbnail($imageFactory, $configuration->base());
-        $this->actions[$action] = new Specification\ApplyReplaceToThumbnail($configuration);
+        $action = new Action\ReplaceToThumbnail($imageFactory, $configuration);
+        $this->actions[$action] = new ReplaceToThumbnailSpecification($configuration);
     }
 
     /**
@@ -46,22 +49,23 @@ class Thumbnails
      */
     public function __invoke(string $html): Result
     {
-        $jsAndCss = new JsAndCss();
         $document = Document::createFragment($html);
+        $jsAndCss = new JsAndCss();
         foreach ($document->findImages() as $imageTag) {
-            $jsAndCss->merge($this->doActions($imageTag));
+            $this->doActions($imageTag, $jsAndCss);
         }
         return new Result((string)$document, $jsAndCss);
     }
     
-    private function doActions(\DOMElement $imgTag): JsAndCss
+    private function doActions(Image $imgTag, JsAndCss $jsAndCss): void
     {
-        $jsAndCss = new JsAndCss();
-        foreach ($this->actions as $action => $specification) {
-            if ($specification($imgTag)) {
-                $jsAndCss->merge($action($imgTag));
+        while ($this->actions->valid()) {
+            $specification = $this->actions->getInfo();
+            if ($specification->isSatisfiedBy($imgTag)) {
+                $action = $this->actions->current();
+                $action($imgTag, $jsAndCss);
             }
+            $this->actions->next();
         }
-        return $jsAndCss;
     }
 }

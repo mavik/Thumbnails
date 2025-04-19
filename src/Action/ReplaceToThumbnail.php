@@ -15,10 +15,11 @@ namespace Mavik\Thumbnails\Action;
 use Mavik\Image\ImageFactory;
 use Mavik\Image\ImageImmutable;
 use Mavik\Image\ImageWithThumbnails;
-use Mavik\Thumbnails\Configuration\Base as Configuration;
+use Mavik\Thumbnails\Configuration;
+use Mavik\Thumbnails\Html\Image;
 use Mavik\Thumbnails\JsAndCss;
 
-class ReplaceToThumbnail extends Ation
+class ReplaceToThumbnail implements ActionInterface
 {
     /** @var ImageFactory */
     private $imageFactory;
@@ -32,37 +33,39 @@ class ReplaceToThumbnail extends Ation
         $this->configuration = $configuration;
     }
 
-    public function __invoke(\DOMElement $imageTag): JsAndCss {
+    public function __invoke(Image $imageTag, JsAndCss $jsAndCss): void
+    {
+        
         $imageWithThumbnails = $this->crateImageWithThumbnails(
             $imageTag,
-            $this->configuration->resizeType(),
-            $this->configuration->scales()
+            $this->configuration->base()->resizeType(),
+            $this->configuration->base()->scales()
         );
         $srcset = $this->createScrset($imageWithThumbnails->getThumbnails());
         if(!empty($srcset)) {
-            $imageTag->setAttribute('srcset', implode(', ', $srcset));
-            $imageTag->setAttribute('sizes', $imageWithThumbnails->getWidth().'px');
+            $imageTag->setSrcset($srcset);
+            $imageTag->setSizes($imageWithThumbnails->getWidth().'px');
         }        
         $defaultThumbnail = $this->selectDefaultThumbnail($imageWithThumbnails);
-        $imageTag->setAttribute('src', $defaultThumbnail->getUrl());
-        $imageTag->setAttribute('width', (string)$defaultThumbnail->getWidth());
-        $imageTag->setAttribute('height', (string)$defaultThumbnail->getHeight());
-        return new JsAndCss();
+        $imageTag->setSrc($defaultThumbnail->getUrl());
+        $imageTag->setWidth($defaultThumbnail->getWidth());
+        $imageTag->setHeight($defaultThumbnail->getHeight());
     }
-
+    
     private function crateImageWithThumbnails(
-        \DOMElement $imageTag,
+        Image $imageTag,
         string $resizeType,
         array $thumbnailScails
     ): ImageWithThumbnails {
-        $src = $imageTag->getAttribute('src');
-        $width = (int)$imageTag->getAttribute('width');
-        $height = (int)$imageTag->getAttribute('height');
+        $src = $imageTag->getSrc();
+        $width = (int)$imageTag->getWidth();
+        $height = (int)$imageTag->getHeight();
         return $this->imageFactory->createImageWithThumbnails(
             $src,
             $width,
             $height,
             $resizeType,
+            $this->configuration->server()->thumbnailsDir(),
             $thumbnailScails
         );
     }

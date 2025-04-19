@@ -16,15 +16,17 @@ class AndSpecification extends Specification
     private $specification1;
     private $specification2;
 
-    public function __construct(Specification $specification1, Specification $specification2, Configuration $configuration)
+    public function __construct(Specification $specification1, Specification $specification2)
     {
-        parent::__construct($configuration);
         $this->specification1 = $specification1;
         $this->specification2 = $specification2;
     }
 
-    public function __invoke(\DOMElement $element): bool
+    public function isSatisfiedBy($candidate): bool
     {
-        return $this->specification1->__invoke($element) && $this->specification2->__invoke($element);
+        return
+            $this->specification1->isSatisfiedBy($candidate)
+            && $this->specification2->isSatisfiedBy($candidate)
+        ;
     }
 }

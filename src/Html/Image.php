@@ -28,6 +28,9 @@ class Image
 
     /** @var string */
     private $heightUnit;
+
+    /** @var bool */
+    private $isSizeChanged = true;
     
     /** @var bool */
     private $isWidthInStyle = false;
@@ -41,7 +44,6 @@ class Image
     public function __construct(\DOMElement $domElement)
     {
         $this->domElement = $domElement;
-        $this->initSize();
     }
     
     public function getSrc(): string
@@ -51,36 +53,43 @@ class Image
 
     public function getWidth(): float
     {
+        $this->initSize();
         return $this->width;
     }
     
     public function getWidthUnit(): string
     {
+        $this->initSize();
         return $this->widthUnit;
     }
 
     public function getHeight(): float
     {
+        $this->initSize();
         return $this->height;
     }
     
     public function getHeightUnit(): string
     {
+        $this->initSize();
         return $this->heightUnit;
     }
     
     public function isSizeInPixels(): bool
     {
+        $this->initSize();
         return $this->isSizeInPixels;
     }
     
     public function isWidthInStyle(): bool
     {
+        $this->initSize();
         return $this->isWidthInStyle;
     }
     
     public function isHeightInStyle(): bool
     {
+        $this->initSize();
         return $this->isHeightInStyle;
     }
 
@@ -94,8 +103,44 @@ class Image
         return $this->domElement->hasAttribute($name);
     }
 
+    public function getDomElement(): \DOMElement
+    {
+        return $this->domElement;
+    }
+
+    public function setSrcset(array $srcset): void
+    {
+        $this->domElement->setAttribute('srcset', implode(', ', $srcset));
+    }
+
+    public function setSizes(string $sizes): void
+    {
+        $this->domElement->setAttribute('sizes', $sizes);
+    }
+
+    public function setSrc(string $src): void
+    {
+        $this->domElement->setAttribute('src', $src);
+    }
+
+    public function setWidth(float $width): void
+    {
+        $this->domElement->setAttribute('width', (string)$width);
+        $this->isSizeChanged = true;
+    }
+
+    public function setHeight(float $height): void
+    {
+        $this->domElement->setAttribute('height', (string)$height);
+        $this->isSizeChanged = true;
+    }
+
     private function initSize(): void
     { 
+        if (!$this->isSizeChanged) {
+            return;
+        }
+
         $this->isSizeInPixels = true;
         
         list($this->width, $this->widthUnit) = $this->numberValueFromAttribute('width');        
@@ -121,6 +166,8 @@ class Image
             (!isset($this->width) || $this->widthUnit == 'px')
             && (!isset($this->height) || $this->heightUnit == 'px')
         ;
+
+        $this->isSizeChanged = false;
     }
     
     /**

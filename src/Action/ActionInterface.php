@@ -12,14 +12,13 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Action;
 
-use Mavik\Thumbnails\Specification\Specification;
+use Mavik\Thumbnails\Html\Image;
 use Mavik\Thumbnails\JsAndCss;
 
-abstract class Ation
+interface ActionInterface
 {
     /**
-     * Change $element
-     * and return JavaScripts and CSS that must be added to HTML document
+     * Change $image and add JS and CSS to $jsAndCss.
      */
-    abstract public function __invoke(\DOMElement $element): JsAndCss;
+    public function __invoke(Image $image, JsAndCss $jsAndCss): void;
 }

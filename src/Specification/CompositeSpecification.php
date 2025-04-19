@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -11,17 +12,17 @@ declare(strict_types=1);
  */
 namespace Mavik\Thumbnails\Specification;
 
-class NotSpecification extends Specification
+abstract class CompositeSpecification extends Specification
 {
-    private $specification;
+    protected Specification $innerSpec;
 
-    public function __construct(Specification $specification)
+    public function __construct(Specification $spec)
     {
-        $this->specification = $specification;
+        $this->innerSpec = $spec;
     }
 
     public function isSatisfiedBy($candidate): bool
     {
-        return !$this->specification->isSatisfiedBy($candidate);
+        return $this->innerSpec->isSatisfiedBy($candidate);
     }
 }
