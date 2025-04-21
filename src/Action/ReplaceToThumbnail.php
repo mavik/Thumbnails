@@ -44,7 +44,6 @@ class ReplaceToThumbnail implements ActionInterface
         $srcset = $this->createScrset($imageWithThumbnails->getThumbnails());
         if(!empty($srcset)) {
             $imageTag->setSrcset($srcset);
-            $imageTag->setSizes($imageWithThumbnails->getWidth().'px');
         }        
         $defaultThumbnail = $this->selectDefaultThumbnail($imageWithThumbnails);
         $imageTag->setSrc($defaultThumbnail->getUrl());
@@ -77,8 +76,8 @@ class ReplaceToThumbnail implements ActionInterface
     private function createScrset(array $thumbnails): array
     {
         $srcset = [];
-        foreach ($thumbnails as $thumbnail) {
-            $srcset[] = $thumbnail->getUrl() . ' ' . $thumbnail->getWidth() . 'w';
+        foreach ($thumbnails as $scale => $thumbnail) {
+            $srcset[] = $thumbnail->getUrl() . " {$scale}x";
         }
         return $srcset;
     }
