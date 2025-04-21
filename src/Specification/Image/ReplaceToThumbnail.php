@@ -19,15 +19,15 @@ class ReplaceToThumbnail extends CompositeSpecification
 {   
     public function __construct(Configuration $configuration)
     {
-        $specification = new HasSuitedClass($configuration);
-        $insideLinkAction = $configuration->base()->insideLinkAction();
-        if (
-            $insideLinkAction != Configuration\Base::INSIDE_LINK_ACTION_ALL
-            && $insideLinkAction != Configuration\Base::INSIDE_LINK_ACTION_RESIZE
-        ) {
+        $hasSuitedClass = new HasSuitedClass($configuration);
+        $isInsidePicture = new IsInsidePicture();
+        $isNotInsidePicture = $isInsidePicture->not();
+        if ($configuration->base()->insideLinkAction() == Configuration\Base::INSIDE_LINK_ACTION_NONE) {
             $isInsideLink = new IsInsideLink($configuration);
             $isNotInsideLink = $isInsideLink->not();
-            $specification = $specification->and($isNotInsideLink);
+            $specification = $hasSuitedClass->and($isNotInsideLink)->and($isNotInsidePicture);
+        } else {
+            $specification = $hasSuitedClass->and($isNotInsidePicture);
         }
         parent::__construct($specification);
     }

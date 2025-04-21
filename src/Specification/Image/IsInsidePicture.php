@@ -13,20 +13,14 @@ namespace Mavik\Thumbnails\Specification\Image;
 
 use Mavik\Thumbnails\Html\Image as HtmlImage;
 
-class IsInsideLink extends Image
+class IsInsidePicture extends Image
 {
     protected function isSatisfiedByImage(HtmlImage $image): bool
     {
-        $currentNode = $image->getDomElement();
-        while ($currentNode = $currentNode->parentNode) {
-            if (
-                $currentNode instanceof \DOMElement
-                && $currentNode->nodeName == 'a'
-                && $currentNode->getAttribute('href') !== ''
-            ) {
-                return true;
-            }
-        }
-        return false;
+        $parentNode = $image->getDomElement()->parentNode;
+        return 
+            $parentNode instanceof \DOMElement
+            && $parentNode->tagName === 'picture'
+        ;
     }
 }
