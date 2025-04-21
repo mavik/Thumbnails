@@ -8,7 +8,7 @@ declare(strict_types=1);
  *  @package Mavik\Thumbnails
  *  @author Vitalii Marenkov <admin@mavik.com.ua>
  *  @copyright 2024 Vitalii Marenkov
- *  @license MIT; see LICENSE
+ *  @license GNU General Public License version 2 or later; see LICENSE
  */
 namespace Mavik\Thumbnails\Specification;
 
