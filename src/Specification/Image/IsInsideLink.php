@@ -17,7 +17,10 @@ class IsInsideLink extends Image
 {
     protected function isSatisfiedByImage(HtmlImage $image): bool
     {
-        $currentNode = $image->getDomElement();
+        $currentNode = $image->getParentNode();
+        if (empty($currentNode)) {
+            return false;
+        }
         while ($currentNode = $currentNode->parentNode) {
             if (
                 $currentNode instanceof \DOMElement

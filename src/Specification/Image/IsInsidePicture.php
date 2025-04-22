@@ -17,7 +17,7 @@ class IsInsidePicture extends Image
 {
     protected function isSatisfiedByImage(HtmlImage $image): bool
     {
-        $parentNode = $image->getDomElement()->parentNode;
+        $parentNode = $image->getParentNode();
         return 
             $parentNode instanceof \DOMElement
             && $parentNode->tagName === 'picture'

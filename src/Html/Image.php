@@ -103,9 +103,9 @@ class Image
         return $this->domElement->hasAttribute($name);
     }
 
-    public function getDomElement(): \DOMElement
+    public function getParentNode(): \DOMNode
     {
-        return $this->domElement;
+        return $this->domElement->parentNode;
     }
 
     public function setSrcset(array $srcset): void
@@ -113,14 +113,10 @@ class Image
         $this->domElement->setAttribute('srcset', implode(', ', $srcset));
     }
 
-    public function setSizes(string $sizes): void
-    {
-        $this->domElement->setAttribute('sizes', $sizes);
-    }
-
     public function setSrc(string $src): void
     {
         $this->domElement->setAttribute('src', $src);
+        $this->isSizeChanged = true;
     }
 
     public function setWidth(float $width): void
