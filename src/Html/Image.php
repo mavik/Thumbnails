@@ -15,7 +15,7 @@ namespace Mavik\Thumbnails\Html;
 class Image
 {
     /** @var \DOMElement */
-    private $domElement;
+    protected $domElement;
     
     /** @var float */
     private $width;
@@ -43,6 +43,9 @@ class Image
 
     public function __construct(\DOMElement $domElement)
     {
+        if ($domElement->tagName !== 'img') {
+            throw new \InvalidArgumentException('DOM element must be an <img> tag');
+        }
         $this->domElement = $domElement;
     }
     
