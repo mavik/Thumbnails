@@ -12,13 +12,16 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Action;
 
+use Mavik\Thumbnails\Html\Image;
+use Mavik\Thumbnails\JsAndCss;
+
 class AddPopUp implements ActionInterface
 {
     private ActionInterface $library;
 
     public function __construct(string $library)
     {
-        $this->library = new $library();
+        $this->library = new PopUp\GLightbox();
     }
 
     /**
@@ -26,6 +29,6 @@ class AddPopUp implements ActionInterface
      */
     public function __invoke(Image $image, JsAndCss $jsAndCss): void
     {
-
+        $this->library->__invoke($image, $jsAndCss);
     }
 }

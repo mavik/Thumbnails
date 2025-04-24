@@ -25,7 +25,8 @@ class Thumbnails
     public function __construct(Configuration $configuration)
     {
         $this->actions = new \SplObjectStorage();
-        $this->addActionReplaceToThumbnail($configuration);   
+        $this->addActionPopUp('GLightbox');
+        $this->addActionReplaceToThumbnail($configuration);        
     }
     
     private function addActionReplaceToThumbnail(Configuration $configuration): void
@@ -40,6 +41,13 @@ class Thumbnails
         $imageFactory = new ImageFactory($imageConfiguration);                
         $action = new Action\ReplaceToThumbnail($imageFactory, $configuration);
         $this->actions[$action] = new ReplaceToThumbnailSpecification($configuration);
+    }
+
+    private function addActionPopUp(string $library): void
+    {
+        $actionClass = '\\Mavik\\Thumbnails\\Action\\PopUp\\' . $library;
+        $action = new $actionClass();
+        $this->actions[$action] = new Specification\Image\AddPopUp();
     }
 
     /**
@@ -67,5 +75,6 @@ class Thumbnails
             }
             $this->actions->next();
         }
+
     }
 }

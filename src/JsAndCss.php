@@ -14,6 +14,7 @@ namespace Mavik\Thumbnails;
 class JsAndCss
 {
     private $js = [];
+    private $inlineJs = [];
     private $css = [];
     
     public function addJs(string $js): void
@@ -25,11 +26,22 @@ class JsAndCss
     {
         $this->css[$css] = true;
     }
+
+    public function addInlineJs(string $js): void
+    {
+        $this->inlineJs[$js] = true;
+    }
     
     /** @return string[] */
     public function js(): array
     {
         return array_keys($this->js);
+    }
+
+    /** @return string[] */
+    public function inlineJs(): array
+    {
+        return array_keys($this->inlineJs);
     }
 
     /** @return string[] */
@@ -40,7 +52,8 @@ class JsAndCss
     
     public function merge(self $jsAndCss): void
     {
-        $this->js = array_merge($this->js, $jsAndCss->js);
-        $this->css = array_merge($this->css, $jsAndCss->css);
+        $this->js = $this->js + $jsAndCss->js;
+        $this->css = $this->css + $jsAndCss->css;
+        $this->inlineJs = $this->inlineJs + $jsAndCss->inlineJs;
     }
 }
