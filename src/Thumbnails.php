@@ -16,6 +16,7 @@ use Mavik\Image\Configuration as ImageConfiguration;
 use Mavik\Thumbnails\Html\Document;
 use Mavik\Thumbnails\Html\Image;
 use Mavik\Thumbnails\Specification\Image\ReplaceToThumbnail as ReplaceToThumbnailSpecification;
+use Mavik\Thumbnails\Specification\Image\UseDefaultSize as UseDefaultSizeSpecification;
 
 class Thumbnails
 {   
@@ -25,8 +26,15 @@ class Thumbnails
     public function __construct(Configuration $configuration)
     {
         $this->actions = new \SplObjectStorage();
+        $this->addActionDefaultSize($configuration);
         $this->addActionPopUp('GLightbox');
         $this->addActionReplaceToThumbnail($configuration);        
+    }
+
+    private function addActionDefaultSize(Configuration $configuration): void
+    {
+        $action = new Action\UseDefaultSize($configuration);
+        $this->actions[$action] = new UseDefaultSizeSpecification($configuration);
     }
     
     private function addActionReplaceToThumbnail(Configuration $configuration): void

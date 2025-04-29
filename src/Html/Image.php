@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Html;
 
+use Mavik\Image\ImageSize;
+
 class Image
 {
     /** @var \DOMElement */
@@ -122,13 +124,13 @@ class Image
         $this->isSizeChanged = true;
     }
 
-    public function setWidth(float $width): void
+    public function setWidth(?float $width): void
     {
         $this->domElement->setAttribute('width', (string)$width);
         $this->isSizeChanged = true;
     }
 
-    public function setHeight(float $height): void
+    public function setHeight(?float $height): void
     {
         $this->domElement->setAttribute('height', (string)$height);
         $this->isSizeChanged = true;

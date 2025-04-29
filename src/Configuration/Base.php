@@ -16,6 +16,10 @@ class Base
     const INSIDE_LINK_ACTION_NONE = 'none';
     const INSIDE_LINK_ACTION_RESIZE = 'resize';
     const INSIDE_LINK_ACTION_ALL = 'all';
+
+    const USE_DEFAULT_SIZE_NO = 'no';
+    const USE_DEFAULT_SIZE_WITHOUT_SIZE = 'without_size';
+    const USE_DEFAULT_SIZE_ALL = 'all';
     
     /** @var string */
     private $resizeType;
@@ -29,20 +33,36 @@ class Base
     /** @var string[] */
     private $excludeClasses;
     
+    /** @var string */
     private $insideLinkAction;
+
+    /** @var string */
+    private $useDefaultSize;
+
+    /** @var int|null */
+    private $defaultWidth;
+
+    /** @var int|null */
+    private $defaultHeight;
 
     public function __construct(
         string $resizeType = 'Stretch',
         array $scales = [1],
         array $includeClasses = [],
         array $excludeClasses = [],
-        string $insideLinkAction = self::INSIDE_LINK_ACTION_RESIZE
+        string $insideLinkAction = self::INSIDE_LINK_ACTION_NONE,
+        string $useDefaultSize = self::USE_DEFAULT_SIZE_NO,
+        int $defaultWidth = null,
+        int $defaultHeight = null,
     ) {
         $this->resizeType = $resizeType;
         $this->scales = $scales;
         $this->includeClasses = $includeClasses;
         $this->excludeClasses = $excludeClasses;
         $this->insideLinkAction = $insideLinkAction;
+        $this->useDefaultSize = $useDefaultSize;
+        $this->defaultWidth = $defaultWidth;
+        $this->defaultHeight = $defaultHeight;
     }
 
     public function resizeType(): string
@@ -71,5 +91,20 @@ class Base
     public function insideLinkAction(): string
     {
         return $this->insideLinkAction;
+    }
+
+    public function useDefaultSize(): string
+    {
+        return $this->useDefaultSize;
+    }
+
+    public function defaultWidth(): ?int
+    {
+        return $this->defaultWidth;
+    }
+
+    public function defaultHeight(): ?int
+    {
+        return $this->defaultHeight;
     }
 }

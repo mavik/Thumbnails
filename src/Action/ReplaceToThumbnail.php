@@ -34,8 +34,7 @@ class ReplaceToThumbnail implements ActionInterface
     }
 
     public function __invoke(Image $imageTag, JsAndCss $jsAndCss): void
-    {
-        
+    {        
         $imageWithThumbnails = $this->crateImageWithThumbnails(
             $imageTag,
             $this->configuration->base()->resizeType(),
