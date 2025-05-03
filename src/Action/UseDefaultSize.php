@@ -33,7 +33,9 @@ class UseDefaultSize implements ActionInterface
      */
     public function __invoke(Image $image, JsAndCss $jsAndCss): void
     {
-        $image->setWidth($this->configuration->base()->defaultWidth());
-        $image->setHeight($this->configuration->base()->defaultHeight());
+        $image->setSize(
+            $this->configuration->base()->defaultWidth(),
+            $this->configuration->base()->defaultHeight()
+        );
     }
 }

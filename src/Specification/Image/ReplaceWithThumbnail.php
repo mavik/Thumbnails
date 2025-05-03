@@ -15,19 +15,25 @@ declare(strict_types=1);
 use Mavik\Thumbnails\Specification\CompositeSpecification;
 use Mavik\Thumbnails\Configuration;
 
-class ReplaceToThumbnail extends CompositeSpecification
+class ReplaceWithThumbnail extends CompositeSpecification
 {   
     public function __construct(Configuration $configuration)
     {
         $hasSuitedClass = new HasSuitedClass($configuration);
-        $isInsidePicture = new IsInsidePicture();
-        $isNotInsidePicture = $isInsidePicture->not();
+        $isNotInsidePicture = (new IsInsidePicture())->not();
+        $isZoomedOut = new IsZoomedOut();
         if ($configuration->base()->insideLinkAction() == Configuration\Base::INSIDE_LINK_ACTION_NONE) {
-            $isInsideLink = new IsInsideLink($configuration);
-            $isNotInsideLink = $isInsideLink->not();
-            $specification = $hasSuitedClass->and($isNotInsideLink)->and($isNotInsidePicture);
+            $isNotInsideLink = (new IsInsideLink($configuration))->not();
+            $specification = $hasSuitedClass
+                ->and($isNotInsideLink)
+                ->and($isNotInsidePicture)
+                ->and($isZoomedOut)
+            ;
         } else {
-            $specification = $hasSuitedClass->and($isNotInsidePicture);
+            $specification = $hasSuitedClass
+                ->and($isNotInsidePicture)
+                ->and($isZoomedOut)
+            ;
         }
         parent::__construct($specification);
     }

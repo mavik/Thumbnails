@@ -31,7 +31,7 @@ class UseDefaultSize extends Image
             case Configuration\Base::USE_DEFAULT_SIZE_ALL;
                 return true;
             case Configuration\Base::USE_DEFAULT_SIZE_WITHOUT_SIZE:
-                if ($image->getAttribute('width') || $image->getAttribute('height')) {
+                if ($image->getWidth() || $image->getHeight()) {
                     return false;
                 }
                 return true;

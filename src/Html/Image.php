@@ -26,7 +26,7 @@ class Image
     private $originalSrc;
 
     /** @var ImageFactory */
-    private $imageFactory;
+    protected $imageFactory;
     
     /** @var float */
     private $width;
@@ -73,13 +73,13 @@ class Image
         return $this->originalSrc;
     }
 
-    public function getWidth(): float
+    public function getWidth(): ?float
     {
         $this->initSize();
         return $this->width;
     }
     
-    public function getHeight(): float
+    public function getHeight(): ?float
     {
         $this->initSize();
         return $this->height;
@@ -138,8 +138,31 @@ class Image
         $defaultThumbnail = $thumbnails[1] ?? current($thumbnails);
         $this->setSrc($defaultThumbnail->getUrl());
         $this->setSrcset($this->createSrcset($thumbnails));
-        $this->changeSize($defaultThumbnail->getWidth(), $defaultThumbnail->getHeight());
+        $this->setSize($defaultThumbnail->getWidth(), $defaultThumbnail->getHeight());
         return true;
+    }
+
+    public function setSize(?int $width, ?int $height): void
+    {
+        if ($this->isWidthInStyle()) {
+            $style = $this->domElement->getAttribute('style');
+            $widthStyle = $width ? 'width: ' . $width . 'px' : 'width: auto';
+            $style = preg_replace('/(?<!\-)\bwidth\s*:\s*\d+\s*px/', $widthStyle, $style);
+            $this->domElement->setAttribute('style', $style);
+        } else {
+            $this->domElement->setAttribute('width', (string)$width);
+        }
+
+        if ($this->isHeightInStyle()) {
+            $style = $this->domElement->getAttribute('style');
+            $heightStyle = $height ? 'height: ' . $height . 'px' : 'height: auto';
+            $style = preg_replace('/(?<!\-)\bheight\s*:\s*\d+\s*px/', $heightStyle, $style);
+            $this->domElement->setAttribute('style', $style);
+        } else {
+            $this->domElement->setAttribute('height', (string)$height);
+        }
+
+        $this->isSizeInitialized = false;
     }
 
     /**
@@ -175,27 +198,6 @@ class Image
     private function setSrc(string $src): void
     {
         $this->domElement->setAttribute('src', $src);
-    }
-
-    private function changeSize(int $width, int $height): void
-    {
-        if ($this->isWidthInStyle()) {
-            $style = $this->domElement->getAttribute('style');
-            $style = preg_replace('/(?<!\-)\bwidth\s*:\s*\d+\s*px/', 'width: ' . $width . 'px', $style);
-            $this->domElement->setAttribute('style', $style);
-        } else {
-            $this->domElement->setAttribute('width', (string)$width);
-        }
-
-        if ($this->isHeightInStyle()) {
-            $style = $this->domElement->getAttribute('style');
-            $style = preg_replace('/(?<!\-)\bheight\s*:\s*\d+\s*px/', 'height: ' . $height . 'px', $style);
-            $this->domElement->setAttribute('style', $style);
-        } else {
-            $this->domElement->setAttribute('height', (string)$height);
-        }
-
-        $this->isSizeInitialized = false;
     }
 
     private function initSize(): void

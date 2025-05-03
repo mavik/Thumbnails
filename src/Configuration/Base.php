@@ -45,6 +45,9 @@ class Base
     /** @var int|null */
     private $defaultHeight;
 
+    /** @var string */
+    private $popUp;
+
     public function __construct(
         string $resizeType = 'Stretch',
         array $scales = [1],
@@ -54,6 +57,7 @@ class Base
         string $useDefaultSize = self::USE_DEFAULT_SIZE_NO,
         int $defaultWidth = null,
         int $defaultHeight = null,
+        string $popUp = null,
     ) {
         $this->resizeType = $resizeType;
         $this->scales = $scales;
@@ -63,6 +67,7 @@ class Base
         $this->useDefaultSize = $useDefaultSize;
         $this->defaultWidth = $defaultWidth;
         $this->defaultHeight = $defaultHeight;
+        $this->popUp = $popUp;
     }
 
     public function resizeType(): string
@@ -106,5 +111,10 @@ class Base
     public function defaultHeight(): ?int
     {
         return $this->defaultHeight;
+    }
+
+    public function popUp(): ?string
+    {
+        return $this->popUp;
     }
 }

@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Html;
 
+use Mavik\Image\ImageFactory;
 use Masterminds\HTML5;
 
 class Document
@@ -30,14 +31,17 @@ class Document
     /** @var \DOMXPath */
     private $xpath;
 
-    public static function create(string $htmlDocument): self
+    /** @var ImageFactory */
+    private $imageFactory;
+
+    public static function create(string $htmlDocument, ImageFactory $imageFactory): self
     {
-        return new self($htmlDocument);
+        return new self($htmlDocument, $imageFactory);
     }
 
-    public static function createFragment(string $htmlFragment): self
+    public static function createFragment(string $htmlFragment, ImageFactory $imageFactory): self
     {
-        return new self($htmlFragment, true);
+        return new self($htmlFragment, $imageFactory, true);
     }
 
 
@@ -45,8 +49,9 @@ class Document
      * @throws \InvalidArgumentException
      * @throws Exception
      */
-    private function __construct(string $html, bool $isFragment = false)
+    private function __construct(string $html, ImageFactory $imageFactory, bool $isFragment = false)
     {
+        $this->imageFactory = $imageFactory;
         if ($isFragment) {
             $this->isFragment = true;
             $html = "<!DOCTYPE html><html><body>{$html}</body></html>";
@@ -69,7 +74,7 @@ class Document
     public function findImages(): \Generator
     {
         foreach ($this->xpath->query('//img') as $imageElement) {
-            yield new Image($imageElement);
+            yield new Image($imageElement, $this->imageFactory);
         }
     }
     

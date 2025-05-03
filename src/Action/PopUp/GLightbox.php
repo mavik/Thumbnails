@@ -20,7 +20,7 @@ use Mavik\Thumbnails\JsAndCss;
 class GLightbox implements ActionInterface
 {
     /**
-     * Change $image and add JS and CSS to $jsAndCss.
+     * Change $imageTag and add JS and CSS to $jsAndCss.
      */
     public function __invoke(Image $image, JsAndCss $jsAndCss): void
     {

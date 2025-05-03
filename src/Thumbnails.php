@@ -12,22 +12,35 @@ declare(strict_types=1);
 namespace Mavik\Thumbnails;
 
 use Mavik\Image\ImageFactory;
-use Mavik\Image\Configuration as ImageConfiguration;
+use Mavik\Image\ImageImmutable;
+use Mavik\Image\Configuration as ImageFactoryConfiguration;
 use Mavik\Thumbnails\Html\Document;
 use Mavik\Thumbnails\Html\Image;
-use Mavik\Thumbnails\Specification\Image\ReplaceToThumbnail as ReplaceToThumbnailSpecification;
+use Mavik\Thumbnails\JsAndCss;
+use Mavik\Thumbnails\Specification\Image\ReplaceWithThumbnail as ReplaceWithThumbnailSpecification;
 use Mavik\Thumbnails\Specification\Image\UseDefaultSize as UseDefaultSizeSpecification;
 
 class Thumbnails
 {   
+    /** @var ImageFactory */
+    private $imageFactory;
+
     /** @var \SplObjectStorage */
     private $actions;
     
     public function __construct(Configuration $configuration)
     {
+        $serverConfiguration = $configuration->server();
+        $imageFactoryConfiguration = new ImageFactoryConfiguration(
+            $serverConfiguration->baseUrl(),
+            $serverConfiguration->webRootDir(),
+            $serverConfiguration->thumbnailsDir(),
+            $serverConfiguration->graphicLibraryPriority()
+        );
+        $this->imageFactory = new ImageFactory($imageFactoryConfiguration);
         $this->actions = new \SplObjectStorage();
         $this->addActionDefaultSize($configuration);
-        $this->addActionPopUp('GLightbox');
+        $this->addActionPopUp($configuration);
         $this->addActionReplaceToThumbnail($configuration);        
     }
 
@@ -39,23 +52,19 @@ class Thumbnails
     
     private function addActionReplaceToThumbnail(Configuration $configuration): void
     {
-        $serverConfiguration = $configuration->server();
-        $imageConfiguration = new ImageConfiguration(
-            $serverConfiguration->baseUrl(),
-            $serverConfiguration->webRootDir(),
-            $serverConfiguration->thumbnailsDir(),
-            $serverConfiguration->graphicLibraryPriority()
-        );
-        $imageFactory = new ImageFactory($imageConfiguration);                
-        $action = new Action\ReplaceToThumbnail($imageFactory, $configuration);
-        $this->actions[$action] = new ReplaceToThumbnailSpecification($configuration);
+        $action = new Action\ReplaceToThumbnail($configuration);
+        $this->actions[$action] = new ReplaceWithThumbnailSpecification($configuration);
     }
 
-    private function addActionPopUp(string $library): void
+    private function addActionPopUp(Configuration $configuration): void
     {
-        $actionClass = '\\Mavik\\Thumbnails\\Action\\PopUp\\' . $library;
+        $popUp = $configuration->base()->popUp();
+        if ($popUp === null) {
+            return;
+        }
+        $actionClass = '\\Mavik\\Thumbnails\\Action\\PopUp\\' . $configuration->base()->popUp();
         $action = new $actionClass();
-        $this->actions[$action] = new Specification\Image\AddPopUp();
+        $this->actions[$action] = new Specification\Image\AddPopUp($configuration);
     }
 
     /**
@@ -65,7 +74,7 @@ class Thumbnails
      */
     public function __invoke(string $html): Result
     {
-        $document = Document::createFragment($html);
+        $document = Document::createFragment($html, $this->imageFactory);
         $jsAndCss = new JsAndCss();
         foreach ($document->findImages() as $imageTag) {
             $this->doActions($imageTag, $jsAndCss);
@@ -73,13 +82,13 @@ class Thumbnails
         return new Result((string)$document, $jsAndCss);
     }
     
-    private function doActions(Image $imgTag, JsAndCss $jsAndCss): void
+    private function doActions(Image $image, JsAndCss $jsAndCss): void
     {
         while ($this->actions->valid()) {
             $specification = $this->actions->getInfo();
-            if ($specification->isSatisfiedBy($imgTag)) {
+            if ($specification->isSatisfiedBy($image)) {
                 $action = $this->actions->current();
-                $action($imgTag, $jsAndCss);
+                $action($image, $jsAndCss);
             }
             $this->actions->next();
         }

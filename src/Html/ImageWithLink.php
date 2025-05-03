@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Html;
 
+use Mavik\Image\ImageFactory;
 use DOMNode;
 
 class ImageWithLink extends Image
@@ -19,9 +20,9 @@ class ImageWithLink extends Image
     /** @var \DOMElement */
     private $linkDomElement;
 
-    public function __construct(\DOMElement $domElement)
+    public function __construct(\DOMElement $domElement, ImageFactory $imageFactory)
     {
-        parent::__construct($domElement);
+        parent::__construct($domElement, $imageFactory);
         $this->linkDomElement = $domElement->ownerDocument->createElement('a');;
         $this->linkDomElement->setAttribute('href', $this->getSrc());
         $this->linkDomElement->setAttribute('class', 'mavik-thumbnails-link');
@@ -34,7 +35,7 @@ class ImageWithLink extends Image
 
     public static function createFromImage(Image $image): self
     {
-        return new self($image->domElement);
+        return new self($image->domElement, $image->imageFactory);
     }
 
     public function getParentNode(): DOMNode
