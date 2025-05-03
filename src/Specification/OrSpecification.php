@@ -25,8 +25,8 @@ class OrSpecification extends Specification
     public function isSatisfiedBy($candidate): bool
     {
         return 
-            $this->specification1->satisfiedBy($candidate)
-            || $this->specification2->satisfiedBy($candidate)
+            $this->specification1->isSatisfiedBy($candidate)
+            || $this->specification2->isSatisfiedBy($candidate)
         ;
     }
 }
