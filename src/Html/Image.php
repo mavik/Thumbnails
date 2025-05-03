@@ -12,12 +12,21 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Html;
 
-use Mavik\Image\ImageSize;
+use Mavik\Image\ImageFactory;
 
 class Image
 {
     /** @var \DOMElement */
     protected $domElement;
+
+    /** ImageImmutable|ImageWithThumbnails */
+    private $image;
+
+    /** @var string */
+    private $originalSrc;
+
+    /** @var ImageFactory */
+    private $imageFactory;
     
     /** @var float */
     private $width;
@@ -32,7 +41,7 @@ class Image
     private $heightUnit;
 
     /** @var bool */
-    private $isSizeChanged = true;
+    private $isSizeInitialized = false;
     
     /** @var bool */
     private $isWidthInStyle = false;
@@ -43,17 +52,25 @@ class Image
     /** @var bool */
     private $isSizeInPixels = false;
 
-    public function __construct(\DOMElement $domElement)
+    public function __construct(\DOMElement $domElement, ImageFactory $imageFactory)
     {
         if ($domElement->tagName !== 'img') {
             throw new \InvalidArgumentException('DOM element must be an <img> tag');
         }
         $this->domElement = $domElement;
+        $this->imageFactory = $imageFactory;
+        $this->originalSrc = $domElement->getAttribute('src');        
+        $this->image = $imageFactory->createImmutable($this->originalSrc);
     }
     
     public function getSrc(): string
     {
         return $this->domElement->getAttribute('src');
+    }
+
+    public function getOriginalSrc(): string
+    {
+        return $this->originalSrc;
     }
 
     public function getWidth(): float
@@ -62,22 +79,10 @@ class Image
         return $this->width;
     }
     
-    public function getWidthUnit(): string
-    {
-        $this->initSize();
-        return $this->widthUnit;
-    }
-
     public function getHeight(): float
     {
         $this->initSize();
         return $this->height;
-    }
-    
-    public function getHeightUnit(): string
-    {
-        $this->initSize();
-        return $this->heightUnit;
     }
     
     public function isSizeInPixels(): bool
@@ -85,17 +90,21 @@ class Image
         $this->initSize();
         return $this->isSizeInPixels;
     }
-    
-    public function isWidthInStyle(): bool
+
+    /**
+     * Real width of the image in pixels
+     */
+    public function getRealWidth(): int
     {
-        $this->initSize();
-        return $this->isWidthInStyle;
+        return $this->image->getWidth();
     }
     
-    public function isHeightInStyle(): bool
+    /**
+     * Real height of the image in pixels
+     */
+    public function getRealHeight(): int
     {
-        $this->initSize();
-        return $this->isHeightInStyle;
+        return $this->image->getHeight();
     }
 
     public function getAttribute(string $name): string
@@ -113,32 +122,85 @@ class Image
         return $this->domElement->parentNode;
     }
 
-    public function setSrcset(array $srcset): void
+    public function useThumbnail(string $resizeType, array $thumbnailScales): bool
+    {
+        $this->image = $this->imageFactory->convertImageToImageWithThumbnails(
+            $this->image,
+            (int)$this->getWidth(),
+            (int)$this->getHeight(),
+            $resizeType,
+            $thumbnailScales,
+        );
+        $thumbnails = $this->image->thumbnails();
+        if (empty($thumbnails)) {
+            return false;
+        }
+        $defaultThumbnail = $thumbnails[1] ?? current($thumbnails);
+        $this->setSrc($defaultThumbnail->getUrl());
+        $this->setSrcset($this->createSrcset($thumbnails));
+        $this->changeSize($defaultThumbnail->getWidth(), $defaultThumbnail->getHeight());
+        return true;
+    }
+
+    /**
+     * @param ImageImmutable[] $thumbnails
+     * @return string[]
+     */
+    private function createSrcset(array $thumbnails): array
+    {
+        $srcset = [];
+        foreach ($thumbnails as $scale => $thumbnail) {
+            $srcset[] = $thumbnail->getUrl() . " {$scale}x";
+        }
+        return $srcset;
+    }
+    
+    private function isWidthInStyle(): bool
+    {
+        $this->initSize();
+        return $this->isWidthInStyle;
+    }
+    
+    private function isHeightInStyle(): bool
+    {
+        $this->initSize();
+        return $this->isHeightInStyle;
+    }
+
+    private function setSrcset(array $srcset): void
     {
         $this->domElement->setAttribute('srcset', implode(', ', $srcset));
     }
 
-    public function setSrc(string $src): void
+    private function setSrc(string $src): void
     {
         $this->domElement->setAttribute('src', $src);
-        $this->isSizeChanged = true;
     }
 
-    public function setWidth(?float $width): void
+    private function changeSize(int $width, int $height): void
     {
-        $this->domElement->setAttribute('width', (string)$width);
-        $this->isSizeChanged = true;
-    }
+        if ($this->isWidthInStyle()) {
+            $style = $this->domElement->getAttribute('style');
+            $style = preg_replace('/(?<!\-)\bwidth\s*:\s*\d+\s*px/', 'width: ' . $width . 'px', $style);
+            $this->domElement->setAttribute('style', $style);
+        } else {
+            $this->domElement->setAttribute('width', (string)$width);
+        }
 
-    public function setHeight(?float $height): void
-    {
-        $this->domElement->setAttribute('height', (string)$height);
-        $this->isSizeChanged = true;
+        if ($this->isHeightInStyle()) {
+            $style = $this->domElement->getAttribute('style');
+            $style = preg_replace('/(?<!\-)\bheight\s*:\s*\d+\s*px/', 'height: ' . $height . 'px', $style);
+            $this->domElement->setAttribute('style', $style);
+        } else {
+            $this->domElement->setAttribute('height', (string)$height);
+        }
+
+        $this->isSizeInitialized = false;
     }
 
     private function initSize(): void
     { 
-        if (!$this->isSizeChanged) {
+        if ($this->isSizeInitialized) {
             return;
         }
 
@@ -168,7 +230,7 @@ class Image
             && (!isset($this->height) || $this->heightUnit == 'px')
         ;
 
-        $this->isSizeChanged = false;
+        $this->isSizeInitialized = true;
     }
     
     /**
