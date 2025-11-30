@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Mavik\Thumbnails\Action;
 
-use Mavik\Thumbnails\Html\Image;
+use Mavik\Thumbnails\Html\Image as Image;
 use Mavik\Thumbnails\JsAndCss;
 
 interface ActionInterface
